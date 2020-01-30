@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="OU2 inlämning 2:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/OU2_inlämning_2_jar</output-path>
+    <root id="archive" name="OU2 inlämning 2.jar">
+      <element id="module-output" name="OU2 inlämning 2" />
+    </root>
+  </artifact>
+</component>
