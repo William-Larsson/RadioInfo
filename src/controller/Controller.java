@@ -14,7 +14,7 @@ public class Controller {
     public Controller(){
         ui = new UserInterface(AppName);
         startWorkerTimer();
-        //TODO: continue to rebuild the controller and the new Worker class
+        //TODO: continue to rebuild the controller and the new Worker class.
     }
 
     private void startWorkerTimer(){
