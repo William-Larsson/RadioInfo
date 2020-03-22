@@ -1,26 +1,44 @@
 package controller;
-import model.XMLParser;
 
-import javax.swing.SwingWorker;
+import javax.swing.*;
 
-/**
- * Abstract SwingWorker class for fetching and parsing XMl
- * using the XMLParser class.
- */
-abstract class Worker extends SwingWorker<Object[][], Object> {
-    protected Controller control;
-    protected String primaryNode;
-    protected XMLParser parser;
+public class Worker extends SwingWorker<Object[][], Object> {
+    /**
+     * Functional interface with sole purpose to signal that
+     * the worker is done
+     */
+    @FunctionalInterface
+    public interface WorkerFunctionalInterface {
+        void done();
+    }
+
+    private WorkerFunctionalInterface workerFunc;
 
     /**
-     * Init the components and variables needed to
-     * update the UI and create a XMlParser
-     * @param control = the controller component
-     * @param primaryXMLNode = the primary node in the XML doc.
+     * Init the Swingworker.
+     * @param workerFunc
      */
-    public Worker (Controller control, String primaryXMLNode){
-        this.control      = control;
-        this.primaryNode  = primaryXMLNode;
-        this.control.getUI().setWaitCursor(true);
+    public Worker(WorkerFunctionalInterface workerFunc) {
+        this.workerFunc = workerFunc;
+    }
+
+    /**
+     * Parse XML and return the parsed values.
+     * @return Object[][]
+     */
+    @Override
+    protected Object[][] doInBackground() {
+        try {
+            //return ;
+        } catch (Exception e){
+            return null;
+        }
+        return null;
+    }
+
+
+    @Override
+    protected void done() {
+        workerFunc.done();
     }
 }
