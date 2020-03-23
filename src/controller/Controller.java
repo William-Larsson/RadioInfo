@@ -8,25 +8,24 @@ import java.util.concurrent.ExecutionException;
  * This is the main controller that sits in between the Model classes and
  * the view, directing the input from the view to model classes and finally
  * back to the view with new and updated data.
- *
- *
- * Tableau: "http://api.sr.se/v2/scheduledepisodes?channelid=164", primaryNode: "scheduledepisode"
- * Channels: "http://api.sr.se/v2/channels/? ", primaryNode: "channel"
  */
 public class Controller {
     private UserInterface ui;
-    private Worker worker = null;
+    private Worker worker;
+    private Timer updateTimer;
     private final static String AppName = "RadioInfo";
-    private final static String APIChannelsUrl = "http://api.sr.se/v2/channels/?";
-    private final static String APIScheduleUrl = "http://api.sr.se/v2/scheduledepisodes?channelid=";
+    private final static String APIChannelsPrimaryNode = "channel";
+    private final static String APISchedulePrimaryNode = "scheduledepisode";
 
 
     /**
-     * Init the controller and graphical user interface.
+     * Init the controller functionality and graphical user interface.
      */
     public Controller(){
-        ui = new UserInterface(AppName);
+        this.ui = new UserInterface(AppName);
+        this.worker = null;
         startWorkerTimer();
+        setUpMenuListeners();
         //TODO: continue to rebuild the controller and the new Worker class.
     }
 
@@ -36,9 +35,16 @@ public class Controller {
      * application and run this same method once every hour.
      */
     private void startWorkerTimer(){
-        Timer timer = new Timer(60 * 60 * 1000, this::startWorker);
-        timer.setInitialDelay(0);
-        timer.start();
+        if (updateTimer != null){
+            if (updateTimer.isRunning()){
+                updateTimer.stop();
+            }
+        }
+
+        //TODO: change timer to 60*60*1000
+        updateTimer = new Timer(15 * 1000, this::startWorker);
+        updateTimer.setInitialDelay(0);
+        updateTimer.start();
     }
 
 
@@ -49,34 +55,50 @@ public class Controller {
      */
     private void startWorker(ActionEvent event){
         if (worker == null){
-            worker = new Worker(this::updateUI);
+            ui.setWaitCursor(true);
+            worker = new Worker(this::updateUI, APIChannelsPrimaryNode);
             worker.execute();
         }
     }
 
 
     /**
-     * Update the ui with the latest information.
+     * Update the UI with the latest information.
      * Is used together with the functional interface used
      * by the swing workers.
      */
     private void updateUI() {
         try {
-            Object[][] data = worker.get(); //Waits for the computation to complete, then gets the result.
+            // .get() waits for the computation to complete, then gets the result.
+            Object[][] data = worker.get();
+
+            if (data == null){
+                UserInterface.IOError();
+            } else {
+                ui.initChannelComponents(data);
+                ui.goToChannelView();
+                ui.setVisible(true);
+            }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
+        } finally {
+            ui.setWaitCursor(false);
         }
+
+        worker = null;
     }
 
 
     /**
-     * Setup button listeners for the UI components.
+     * Setup button listeners for the JMenu components.
      */
-    public void setUpUIListeners(){
+    public void setUpMenuListeners(){
         ui.setChannelMenuItemListener(actionEvent -> ui.goToChannelView());
-        //ui.setUpdateMenuItemListener(actionEvent -> this.updateTableData());
+        ui.setUpdateMenuItemListener(actionEvent -> this.startWorkerTimer());
         ui.setAboutMenuItemListener(actionEvent -> ui.openAboutRadioInfoWindow());
         ui.setExitMenuItemListener(actionEvent -> ui.exitProgram());
+
+        //todo: move this, this is not menu, this is the channels
         //ui.setChannelJButtonListeners(this::startTableauWorker);
     }
 }
