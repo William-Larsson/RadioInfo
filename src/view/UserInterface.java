@@ -13,9 +13,7 @@ import java.util.ArrayList;
  */
 public class UserInterface {
     private static JFrame frame;
-    private BuildJMenuBar buildJMenuBar;
     private BuildChannelsLayout buildChannelsLayout;
-    private BuildTableauJTable buildTableauJTable;
     private JPanel tableauPanel;
     private JScrollPane channelsPanel;
     private JScrollPane tableauTable;
@@ -26,27 +24,17 @@ public class UserInterface {
      * @param title = The title of the window.
      */
     public UserInterface(String title){
+        // Frame specific settings
         frame = new JFrame();
         frame.setTitle(title);
         frame.setSize(new Dimension(900, 600));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
-        frame.setResizable(false);
-    }
-
-
-    /**
-     * Build the UI component that will be active at the start
-     * of the program.
-     * @param data = Data[][] so that a JTable can be built
-     *               for the channels table.
-     */
-    public void initUIComponents(Object[][] data){
-        this.buildJMenuBar = new BuildJMenuBar();
-        this.menuBar = buildJMenuBar.getMenubar();
-        frame.setJMenuBar(this.menuBar);
-        initChannelComponents(data);
+        frame.setVisible(true);
         frame.setLocationRelativeTo(null);
+        // menubar set-up
+        this.menuBar = new BuildJMenuBar().getMenubar();
+        frame.setJMenuBar(this.menuBar);
     }
 
 
@@ -57,6 +45,7 @@ public class UserInterface {
      */
     public void initChannelComponents(Object[][] data) {
         if (channelsPanel != null){
+            this.removeChannelJButtonListeners();
             frame.remove(channelsPanel);
         }
         this.buildChannelsLayout = new BuildChannelsLayout(data);
@@ -70,18 +59,24 @@ public class UserInterface {
     /**
      * Build and initialize all components needed to view
      * a program tableau.
-     * @param data
-     * @param columnNames
+     * @param data = tableau data
+     * @param columnNames = the titles for the tableau columns
      */
     public void initTableauComponents(
             Object[][] data, String[] columnNames, Object image, String desc)
     {
+        if (tableauTable != null){
+            frame.remove(tableauTable);
+        }
+
         this.tableauPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         JPanel header = this.buildTableauHeader(image, desc);
 
-        this.buildTableauJTable = new BuildTableauJTable(data, columnNames);
-        this.tableauTable = buildTableauJTable.getScrollableTable();
+        this.tableauTable = new BuildTableauJTable(
+                data,
+                columnNames
+        ).getScrollableTable();
 
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
@@ -245,6 +240,20 @@ public class UserInterface {
             button.addActionListener(actionListener);
         }
     }
+
+
+    /**
+     * Remove listeners for all the channel buttons
+     */
+    public void removeChannelJButtonListeners(){
+        for (JButton button: buildChannelsLayout.getJButtons()){
+            for (ActionListener listener : button.getActionListeners()){
+                button.removeActionListener(listener);
+            }
+        }
+    }
+
+
 
 
     /**
