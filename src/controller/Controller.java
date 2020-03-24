@@ -41,8 +41,8 @@ public class Controller {
             }
         }
 
-        //TODO: change timer to 60*60*1000
-        updateTimer = new Timer(15 * 1000, this::startWorker);
+        //TODO: change timer to  15*1000 for testing!
+        updateTimer = new Timer(60*60*1000, this::startWorker);
         updateTimer.setInitialDelay(0);
         updateTimer.start();
     }
@@ -55,8 +55,17 @@ public class Controller {
      */
     private void startWorker(ActionEvent event){
         if (worker == null){
+            Object eventSource = event.getSource();
+            Class eventClass = eventSource.getClass();
+
+            //TODO: continue to work here...
             ui.setWaitCursor(true);
-            worker = new Worker(this::updateUI, APIChannelsPrimaryNode);
+            if (JButton.class.isAssignableFrom(eventClass)){
+                worker = new Worker(this::updateUI, APISchedulePrimaryNode);
+            } else {
+                worker = new Worker(this::updateUI, APIChannelsPrimaryNode);
+            }
+
             worker.execute();
         }
     }
@@ -77,6 +86,8 @@ public class Controller {
             } else {
                 ui.initChannelComponents(data);
                 ui.goToChannelView();
+                // TODO: should I set the listeners for the JButtons somewhere else?
+                ui.setChannelJButtonListeners(this::startWorker);
                 ui.setVisible(true);
             }
         } catch (InterruptedException | ExecutionException e) {
@@ -97,8 +108,5 @@ public class Controller {
         ui.setUpdateMenuItemListener(actionEvent -> this.startWorkerTimer());
         ui.setAboutMenuItemListener(actionEvent -> ui.openAboutRadioInfoWindow());
         ui.setExitMenuItemListener(actionEvent -> ui.exitProgram());
-
-        //todo: move this, this is not menu, this is the channels
-        //ui.setChannelJButtonListeners(this::startTableauWorker);
     }
 }

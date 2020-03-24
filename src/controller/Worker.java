@@ -1,25 +1,21 @@
 package controller;
-
 import model.XMLParser;
-
 import javax.swing.*;
 import java.io.IOException;
 
+/**
+ * Swing worker for reading and parsing XMl on a
+ * separate thread than the EDT. Uses a Functional
+ * Interface to keep the GUI related updates happening
+ * from the controller itself.
+ */
 public class Worker extends SwingWorker<Object[][], Object> {
-    /**
-     * Functional interface with sole purpose to signal that
-     * the worker is done
-     */
-    @FunctionalInterface
-    public interface WorkerFunctionalInterface {
-        void done();
-    }
 
     private WorkerFunctionalInterface workerFunc;
-    private XMLParser xmlParser;
     private String primaryNode;
     private final String APIChannelsUrl = "http://api.sr.se/v2/channels/?";
     private final static String APIScheduleUrl = "http://api.sr.se/v2/scheduledepisodes?channelid=";
+
 
     /**
      * Init the Swing worker.
@@ -30,6 +26,7 @@ public class Worker extends SwingWorker<Object[][], Object> {
         this.primaryNode = primaryNode;
     }
 
+
     /**
      * Parse XML and return the parsed values.
      * @return Object[][] = the
@@ -38,7 +35,7 @@ public class Worker extends SwingWorker<Object[][], Object> {
     protected Object[][] doInBackground() {
         try {
             this.testGUIResponsiveness();
-            xmlParser = new XMLParser(APIChannelsUrl, primaryNode);
+            XMLParser xmlParser = new XMLParser(APIChannelsUrl, primaryNode);
             return xmlParser.getChannelData(xmlParser.getXmlNodes());
         } catch (IOException e){
             return null;
@@ -46,6 +43,10 @@ public class Worker extends SwingWorker<Object[][], Object> {
     }
 
 
+    /**
+     * Calls the functional interface method done()
+     * when the swing worker thread is finished.
+     */
     @Override
     protected void done() {
         workerFunc.done();
