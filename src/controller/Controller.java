@@ -17,6 +17,7 @@ public class Controller {
     private final static String AppName = "RadioInfo";
     private final static String APIChannelsPrimaryNode = "channel";
     private final static String APISchedulePrimaryNode = "scheduledepisode";
+    private final static String APIChannelsUrl = "http://api.sr.se/v2/channels/?";
 
 
     /**
@@ -61,9 +62,9 @@ public class Controller {
 
             if (JButton.class.isAssignableFrom(eventClass)){
                 String scheduleURL = this.getTableauPreURL(event);
-                worker = new Worker(this::updateTableauUI, APISchedulePrimaryNode);
+                worker = new Worker(this::updateTableauUI, scheduleURL, APISchedulePrimaryNode);
             } else {
-                worker = new Worker(this::updateChannelUI, APIChannelsPrimaryNode);
+                worker = new Worker(this::updateChannelUI, APIChannelsUrl, APIChannelsPrimaryNode);
             }
 
             ui.setWaitCursor(true);

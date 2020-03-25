@@ -12,17 +12,16 @@ import java.io.IOException;
 public class Worker extends SwingWorker<Object[][], Object> {
 
     private WorkerFunctionalInterface workerFunc;
+    private String APIUrl;
     private String primaryNode;
-    private final String APIChannelsUrl = "http://api.sr.se/v2/channels/?";
-    private final static String APIScheduleUrl = "http://api.sr.se/v2/scheduledepisodes?channelid=";
-
 
     /**
      * Init the Swing worker.
      * @param workerFunc = the functional interface method
      */
-    public Worker(WorkerFunctionalInterface workerFunc, String primaryNode) {
-        this.workerFunc = workerFunc;
+    public Worker(WorkerFunctionalInterface workerFunc, String APIUrl, String primaryNode) {
+        this.workerFunc  = workerFunc;
+        this.APIUrl      = APIUrl;
         this.primaryNode = primaryNode;
     }
 
@@ -35,8 +34,9 @@ public class Worker extends SwingWorker<Object[][], Object> {
     protected Object[][] doInBackground() {
         try {
             //this.testGUIResponsiveness();
-            XMLParser xmlParser = new XMLParser(APIChannelsUrl, primaryNode);
-            return xmlParser.getChannelData(xmlParser.getXmlNodes());
+            XMLParser xmlParser = new XMLParser(APIUrl, primaryNode);
+            Object[][] data = xmlParser.getChannelData(xmlParser.getXmlNodes());
+            return data;
         } catch (IOException e){
             return null;
         }
