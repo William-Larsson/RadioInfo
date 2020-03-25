@@ -27,7 +27,7 @@ public class UserInterface {
         // Frame specific settings
         frame = new JFrame();
         frame.setTitle(title);
-        frame.setSize(new Dimension(900, 600));
+        frame.setSize(new Dimension(950, 600));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
         frame.setVisible(true);

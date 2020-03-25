@@ -34,7 +34,7 @@ public class Worker extends SwingWorker<Object[][], Object> {
     @Override
     protected Object[][] doInBackground() {
         try {
-            this.testGUIResponsiveness();
+            //this.testGUIResponsiveness();
             XMLParser xmlParser = new XMLParser(APIChannelsUrl, primaryNode);
             return xmlParser.getChannelData(xmlParser.getXmlNodes());
         } catch (IOException e){

@@ -13,6 +13,7 @@ public class Controller {
     private UserInterface ui;
     private Worker worker;
     private Timer updateTimer;
+    private Object[][] channelData;
     private final static String AppName = "RadioInfo";
     private final static String APIChannelsPrimaryNode = "channel";
     private final static String APISchedulePrimaryNode = "scheduledepisode";
@@ -58,25 +59,25 @@ public class Controller {
             Object eventSource = event.getSource();
             Class eventClass = eventSource.getClass();
 
-            //TODO: continue to work here...
-            ui.setWaitCursor(true);
             if (JButton.class.isAssignableFrom(eventClass)){
-                worker = new Worker(this::updateUI, APISchedulePrimaryNode);
+                String scheduleURL = this.getTableauPreURL(event);
+                worker = new Worker(this::updateTableauUI, APISchedulePrimaryNode);
             } else {
-                worker = new Worker(this::updateUI, APIChannelsPrimaryNode);
+                worker = new Worker(this::updateChannelUI, APIChannelsPrimaryNode);
             }
 
+            ui.setWaitCursor(true);
             worker.execute();
         }
     }
 
 
     /**
-     * Update the UI with the latest information.
+     * Update the channels UI with the latest information.
      * Is used together with the functional interface used
      * by the swing workers.
      */
-    private void updateUI() {
+    private void updateChannelUI() {
         try {
             // .get() waits for the computation to complete, then gets the result.
             Object[][] data = worker.get();
@@ -84,10 +85,40 @@ public class Controller {
             if (data == null){
                 UserInterface.IOError();
             } else {
+                this.channelData = data;
                 ui.initChannelComponents(data);
                 ui.goToChannelView();
-                // TODO: should I set the listeners for the JButtons somewhere else?
                 ui.setChannelJButtonListeners(this::startWorker);
+                ui.setVisible(true);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        } finally {
+            ui.setWaitCursor(false);
+        }
+
+        worker = null;
+    }
+
+
+    /**
+     * Update the tableau UI with the latest information.
+     * Is used together with the functional interface used
+     * by the swing workers.
+     */
+    private void updateTableauUI() {
+        try {
+            // .get() waits for the computation to complete, then gets the result.
+            Object[][] data = worker.get();
+            String[] columnNames = {"Radioprogram", "Starttid", "Sluttid", "Status"};
+
+            if (data == null){
+                UserInterface.IOError();
+            } else {
+                //Todo: change this init call!
+                ui.initTableauComponents(data, columnNames, this.channelData[0][0], "this is a test");
+
+                ui.goToTableauView();
                 ui.setVisible(true);
             }
         } catch (InterruptedException | ExecutionException e) {
@@ -108,5 +139,41 @@ public class Controller {
         ui.setUpdateMenuItemListener(actionEvent -> this.startWorkerTimer());
         ui.setAboutMenuItemListener(actionEvent -> ui.openAboutRadioInfoWindow());
         ui.setExitMenuItemListener(actionEvent -> ui.exitProgram());
+    }
+
+
+    /**
+
+     */
+    /**
+     * * Get the preURL (no date/pagination) for the
+     * channel where the action event was called
+     * @param eventSource = the source that triggered the event
+     * @return = the url to the tableau for a channel
+     * @throws IllegalArgumentException = the source does not match
+     *                                    any channel.
+     * @throws NullPointerException = channel data is missing.
+     */
+    private String getTableauPreURL(ActionEvent eventSource)
+            throws IllegalArgumentException, NullPointerException
+    {
+        if (this.channelData != null){
+            String event = eventSource.getActionCommand();
+            for (Object[] obj : channelData){
+                if (obj[1].equals(event)){
+
+                    // TODO: the commented section was previously used to store the
+                    //      channel image/description so these could be displayed at
+                    //      the top of the tableau page.
+                    //this.channelImage = obj[0];
+                    //this.channelDescription = obj[2].toString();
+
+                    return obj[3].toString();
+                }
+            }
+            throw new IllegalArgumentException();
+        } else {
+            throw new NullPointerException();
+        }
     }
 }
