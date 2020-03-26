@@ -1,22 +1,24 @@
 package model;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * A class that handles everything regarding date and time
  * for the model.
  */
 public class DateTimeUtil {
-    private DateTimeFormatter dateFormat;
+    private SimpleDateFormat dateFormat;
     private DateTimeFormatter hourFormat;
 
     /**
      * init DateTimeFormatter-patterns
      */
     public DateTimeUtil(){
-        dateFormat = DateTimeFormatter.ofPattern("YYYY-MM-DD");
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         hourFormat = DateTimeFormatter.ofPattern("HH");
     }
 
@@ -45,7 +47,11 @@ public class DateTimeUtil {
      * @return = date as string.
      */
     public String getCurrentDate(){
-        return ZonedDateTime.now().format(dateFormat);
+        return dateFormat.format(
+            Date.from(
+                java.time.ZonedDateTime.now().toInstant()
+            )
+        );
     }
 
 
@@ -55,11 +61,25 @@ public class DateTimeUtil {
      * @return = the day.
      */
     public String getOtherDate(){
+        String date;
         if (Integer.parseInt(ZonedDateTime.now().format(hourFormat)) >= 12){
-            return ZonedDateTime.now().plusDays(1).format(dateFormat);
+            date = dateFormat.format(
+                Date.from(
+                    java.time.ZonedDateTime.now()
+                        .plusDays(1)
+                        .toInstant()
+                )
+            );
         } else {
-            return ZonedDateTime.now().minusDays(1).format(dateFormat);
+            date = dateFormat.format(
+                Date.from(
+                    java.time.ZonedDateTime.now()
+                        .minusDays(1)
+                        .toInstant()
+                )
+            );
         }
+        return date;
     }
 
 

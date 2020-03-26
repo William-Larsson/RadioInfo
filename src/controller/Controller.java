@@ -35,6 +35,8 @@ public class Controller {
     /**
      * Immediately start a worker that will update the
      * application and run this same method once every hour.
+     * Will reset the UI to the applications page no matter
+     * what where the user is in the application.
      */
     private void startWorkerTimer(){
         if (updateTimer != null){
@@ -43,7 +45,7 @@ public class Controller {
             }
         }
 
-        //TODO: change timer to  15*1000 for testing!
+        //TODO: change timer to 15*1000 for release!
         updateTimer = new Timer(60*60*1000, this::startWorker);
         updateTimer.setInitialDelay(0);
         updateTimer.start();

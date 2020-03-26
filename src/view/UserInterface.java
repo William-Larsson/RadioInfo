@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * and all of its information ond options to the user.
  */
 public class UserInterface {
-    private static JFrame frame;
+    private JFrame frame;
     private BuildChannelsLayout buildChannelsLayout;
     private JPanel tableauPanel;
     private JScrollPane channelsPanel;

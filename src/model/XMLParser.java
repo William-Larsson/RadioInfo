@@ -161,7 +161,7 @@ public class XMLParser {
      */
     public URL createURLFromDate(String url, String date)
             throws MalformedURLException {
-        url = url + "&pagination=true&size=1000&date=" + date;
+        url = url + "&pagination=false&size=1000&date=" + date;
         return new URL(url.replace(" ", "%20"));
     }
 
