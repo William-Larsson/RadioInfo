@@ -215,11 +215,11 @@ public class XMLParser {
                     element = (Element) node;
                     data[i][0] = linkToTableImage(element, "image");
                     data[i][1] = node.getAttributes()
-                            .getNamedItem("name")
-                            .getTextContent();
+                        .getNamedItem("name")
+                        .getTextContent();
                     data[i][2] = element.getElementsByTagName("tagline")
-                            .item(0)
-                            .getTextContent();
+                        .item(0)
+                        .getTextContent();
                     temp = element.getElementsByTagName("scheduleurl");
                     if (temp.getLength() > 0){
                         data[i][3] = temp.item(0).getTextContent();
@@ -250,33 +250,35 @@ public class XMLParser {
                 if (node.getNodeType() == Node.ELEMENT_NODE){
                     element = (Element) node;
                     data[i][0] = element
-                            .getElementsByTagName("title")
-                            .item(0)
-                            .getTextContent();
+                        .getElementsByTagName("title")
+                        .item(0)
+                        .getTextContent();
                     data[i][1] = dateTimeUtil
-                            .stringToZonedDateTime(element
-                            .getElementsByTagName("starttimeutc")
-                            .item(0)
-                            .getTextContent()
+                        .stringToZonedDateTime(element
+                        .getElementsByTagName("starttimeutc")
+                        .item(0)
+                        .getTextContent()
                     ).toString();
                     data[i][2] = dateTimeUtil
-                            .stringToZonedDateTime(element
-                            .getElementsByTagName("endtimeutc")
-                            .item(0)
-                            .getTextContent()
-                    ).toString();
-                    data[i][3] = dateTimeUtil.isBeforeNow(element
-                                    .getElementsByTagName("starttimeutc")
-                                    .item(0)
-                                    .getTextContent(),
+                        .stringToZonedDateTime(
                             element
-                                    .getElementsByTagName("endtimeutc")
+                                .getElementsByTagName("endtimeutc")
                                     .item(0)
                                     .getTextContent()
+                    ).toString();
+                    data[i][3] = dateTimeUtil.isBeforeNow(
+                        element
+                            .getElementsByTagName("starttimeutc")
+                                .item(0)
+                                .getTextContent(),
+                        element
+                            .getElementsByTagName("endtimeutc")
+                                .item(0)
+                                .getTextContent()
                     );
                     data[i][4] = linkToTableImage(element, "imageurl");
                     data[i][5] = element
-                            .getElementsByTagName("description")
+                        .getElementsByTagName("description")
                             .item(0)
                             .getTextContent();
                 }

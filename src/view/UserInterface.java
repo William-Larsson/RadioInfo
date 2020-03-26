@@ -35,6 +35,7 @@ public class UserInterface {
         // menubar set-up
         this.menuBar = new BuildJMenuBar().getMenubar();
         frame.setJMenuBar(this.menuBar);
+        menuBar.getMenu(0).getItem(0).setEnabled(false);
     }
 
 
@@ -49,7 +50,8 @@ public class UserInterface {
             frame.remove(channelsPanel);
         }
         this.buildChannelsLayout = new BuildChannelsLayout(data);
-        this.channelsPanel = this.buildChannelsLayout.getScrollableChannelsPanel();
+        this.channelsPanel = this.buildChannelsLayout
+            .getScrollableChannelsPanel();
         frame.add(channelsPanel);
         frame.getContentPane().validate();
         frame.getContentPane().repaint();
@@ -100,7 +102,7 @@ public class UserInterface {
      * @param desc = the description text
      * @return = JPanel
      */
-    public JPanel buildTableauHeader(Object image, String desc){
+    private JPanel buildTableauHeader(Object image, String desc){
         JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         ImageCreator imgCreate = new ImageCreator();
@@ -133,6 +135,7 @@ public class UserInterface {
      */
     public void goToChannelView() {
         channelsPanel.setVisible(true);
+        menuBar.getMenu(0).getItem(0).setEnabled(false);
         if (tableauPanel != null){
             tableauPanel.setVisible(false);
         }
@@ -146,6 +149,7 @@ public class UserInterface {
      */
     public void goToTableauView() {
         tableauPanel.setVisible(true);
+        menuBar.getMenu(0).getItem(0).setEnabled(true);
         if (channelsPanel != null){
             channelsPanel.setVisible(false);
         }
@@ -158,14 +162,14 @@ public class UserInterface {
      */
     public void openAboutRadioInfoWindow(){
         JOptionPane.showMessageDialog(
-                null,
-                "Välkommen till RadioInfo!\n" +
-                        "Här kan du enkelt hitta information" +
-                        "om alla radiokanaler från SR.\n " +
-                        "Du kan även se kanalernas aktuella " +
-                        "programtablå.",
-                "Om RadioInfo",
-                JOptionPane.OK_OPTION
+            null,
+            "Välkommen till RadioInfo!\n" +
+                    "Här kan du enkelt hitta information" +
+                    "om alla radiokanaler från SR.\n " +
+                    "Du kan även se kanalernas aktuella " +
+                    "programtablå.",
+            "Om RadioInfo",
+            JOptionPane.OK_OPTION
         );
     }
 
@@ -245,7 +249,7 @@ public class UserInterface {
     /**
      * Remove listeners for all the channel buttons
      */
-    public void removeChannelJButtonListeners(){
+    private void removeChannelJButtonListeners(){
         for (JButton button: buildChannelsLayout.getJButtons()){
             for (ActionListener listener : button.getActionListeners()){
                 button.removeActionListener(listener);
@@ -254,16 +258,14 @@ public class UserInterface {
     }
 
 
-
-
     /**
      * In case there is an issue with the schedule url.
      */
-    public void noScheduleError(){
+    public static void noScheduleError(){
         JOptionPane.showMessageDialog(null,
-                "Ingen programtablå kunde hittas för denna kanal.",
-                "RadioInfo",
-                JOptionPane.ERROR_MESSAGE);
+            "Ingen programtablå kunde hittas för denna kanal.",
+            "RadioInfo",
+            JOptionPane.ERROR_MESSAGE);
     }
 
 
@@ -272,10 +274,10 @@ public class UserInterface {
      */
     public static void IOError(){
         JOptionPane.showMessageDialog(null,
-                "Ett fel intäffade vid kommunikation med " +
-                        "vår server.\n Vänligen kontrollera din " +
-                        "internetanslutning.",
-                "RadioInfo",
-                JOptionPane.ERROR_MESSAGE);
+            "Ett fel intäffade vid kommunikation med " +
+                    "vår server.\n Vänligen kontrollera din " +
+                    "internetanslutning.",
+            "RadioInfo",
+            JOptionPane.ERROR_MESSAGE);
     }
 }

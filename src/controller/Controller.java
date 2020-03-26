@@ -14,21 +14,16 @@ public class Controller {
     private Worker worker;
     private Timer updateTimer;
     private Object[][] channelData;
-    private final static String AppName = "RadioInfo";
-    private final static String APIChannelsPrimaryNode = "channel";
-    private final static String APISchedulePrimaryNode = "scheduledepisode";
-    private final static String APIChannelsUrl = "http://api.sr.se/v2/channels/?";
-
+    private Object[] tableauData;
 
     /**
      * Init the controller functionality and graphical user interface.
      */
     public Controller(){
-        this.ui = new UserInterface(AppName);
+        this.ui = new UserInterface("RadioInfo");
         this.worker = null;
         startWorkerTimer();
         setUpMenuListeners();
-        //TODO: continue to rebuild the controller and the new Worker class.
     }
 
 
@@ -44,8 +39,6 @@ public class Controller {
                 updateTimer.stop();
             }
         }
-
-        //TODO: change timer to 15*1000 for release!
         updateTimer = new Timer(60*60*1000, this::startWorker);
         updateTimer.setInitialDelay(0);
         updateTimer.start();
@@ -63,12 +56,17 @@ public class Controller {
             Class eventClass = eventSource.getClass();
 
             if (JButton.class.isAssignableFrom(eventClass)){
-                String scheduleURL = this.getTableauPreURL(event);
-                worker = new Worker(this::updateTableauUI, scheduleURL, APISchedulePrimaryNode);
+                this.setTableauData(event);
+                if (this.tableauData != null){
+                    String scheduleURL = (String)this.tableauData[2];
+                    String APISchedulePrimaryNode = "scheduledepisode";
+                    worker = new Worker(this::updateTableauUI, scheduleURL, APISchedulePrimaryNode);
+                }
             } else {
+                String APIChannelsPrimaryNode = "channel";
+                String APIChannelsUrl = "http://api.sr.se/v2/channels/?";
                 worker = new Worker(this::updateChannelUI, APIChannelsUrl, APIChannelsPrimaryNode);
             }
-
             ui.setWaitCursor(true);
             worker.execute();
         }
@@ -82,7 +80,6 @@ public class Controller {
      */
     private void updateChannelUI() {
         try {
-            // .get() waits for the computation to complete, then gets the result.
             Object[][] data = worker.get();
 
             if (data == null){
@@ -99,7 +96,6 @@ public class Controller {
         } finally {
             ui.setWaitCursor(false);
         }
-
         worker = null;
     }
 
@@ -111,16 +107,18 @@ public class Controller {
      */
     private void updateTableauUI() {
         try {
-            // .get() waits for the computation to complete, then gets the result.
             Object[][] data = worker.get();
             String[] columnNames = {"Radioprogram", "Starttid", "Sluttid", "Status"};
 
             if (data == null){
-                UserInterface.IOError();
+                UserInterface.noScheduleError();
             } else {
-                //Todo: change this init call!
-                ui.initTableauComponents(data, columnNames, this.channelData[0][0], "this is a test");
-
+                ui.initTableauComponents(
+                    data,
+                    columnNames,
+                    this.tableauData[0],
+                    (String)this.tableauData[1]
+                );
                 ui.goToTableauView();
                 ui.setVisible(true);
             }
@@ -129,7 +127,6 @@ public class Controller {
         } finally {
             ui.setWaitCursor(false);
         }
-
         worker = null;
     }
 
@@ -137,7 +134,7 @@ public class Controller {
     /**
      * Setup button listeners for the JMenu components.
      */
-    public void setUpMenuListeners(){
+    private void setUpMenuListeners(){
         ui.setChannelMenuItemListener(actionEvent -> ui.goToChannelView());
         ui.setUpdateMenuItemListener(actionEvent -> this.startWorkerTimer());
         ui.setAboutMenuItemListener(actionEvent -> ui.openAboutRadioInfoWindow());
@@ -146,32 +143,26 @@ public class Controller {
 
 
     /**
-
-     */
-    /**
      * * Get the preURL (no date/pagination) for the
      * channel where the action event was called
      * @param eventSource = the source that triggered the event
-     * @return = the url to the tableau for a channel
      * @throws IllegalArgumentException = the source does not match
      *                                    any channel.
      * @throws NullPointerException = channel data is missing.
      */
-    private String getTableauPreURL(ActionEvent eventSource)
+    private void setTableauData(ActionEvent eventSource)
             throws IllegalArgumentException, NullPointerException
     {
         if (this.channelData != null){
+            Object[] data = new Object[3];
             String event = eventSource.getActionCommand();
             for (Object[] obj : channelData){
                 if (obj[1].equals(event)){
-
-                    // TODO: the commented section was previously used to store the
-                    //      channel image/description so these could be displayed at
-                    //      the top of the tableau page.
-                    //this.channelImage = obj[0];
-                    //this.channelDescription = obj[2].toString();
-
-                    return obj[3].toString();
+                    data[0] = obj[0]; // channel image
+                    data[1] = obj[2].toString(); // channel desc.
+                    data[2] = obj[3].toString(); // url to schedule
+                    this.tableauData = data;
+                    return;
                 }
             }
             throw new IllegalArgumentException();

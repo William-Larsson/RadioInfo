@@ -26,7 +26,7 @@ public class BuildTableauJTable extends BuildJTable{
      * Convert the time-string to a format that is easily readable
      * for the user.
      */
-    public void setReadableStartAndEndTimes(){
+    private void setReadableStartAndEndTimes(){
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE, HH:mm");
         for (int i = 0; i < table.getRowCount(); ++i){
             this.table.setValueAt(ZonedDateTime.parse(

@@ -28,15 +28,14 @@ public class Worker extends SwingWorker<Object[][], Object> {
 
     /**
      * Parse XML and return the parsed values.
-     * @return Object[][] = the
+     * @return Object[][] = the parsed values
      */
     @Override
     protected Object[][] doInBackground() {
         try {
             //this.testGUIResponsiveness();
             XMLParser xmlParser = new XMLParser(APIUrl, primaryNode);
-            Object[][] data = xmlParser.getChannelData(xmlParser.getXmlNodes());
-            return data;
+            return xmlParser.getChannelData(xmlParser.getXmlNodes());
         } catch (IOException e){
             return null;
         }
